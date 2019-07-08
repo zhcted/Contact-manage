@@ -1,0 +1,11 @@
+{
+  "name": "contactmanage",
+  "version": "1.0.0",
+  "description": "Using ```File system``` in [Node.js](https://nodejs.org/).\r Using json for data.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
