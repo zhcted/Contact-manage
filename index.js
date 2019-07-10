@@ -6,7 +6,6 @@ function loadData(){
     var fileData = fs.readFileSync(dataFile);
     contacts = JSON.parse(fileData);
 };
-
 function showMenu(){
     console.log('1. Show all contact');
     console.log('2. Add new contact');
@@ -33,7 +32,8 @@ function showMenu(){
             showMenu();
             break;
         case '5':
-            searchContact();
+            var search = readlineSync.question('Enter a name, number or id to search: ');
+            console.log('Search result: ',searchContact(search));         
             showMenu();
             break;
         case '6':
@@ -46,51 +46,71 @@ function showMenu(){
     }
 };
 function showAllContact(){
-    for(var contact of contacts){
-        console.log(contact.name, contact.number);
-    }
+        console.log(contacts);
 };
 function addNewContact(){
     var name = readlineSync.question('Name: ');
     var number = readlineSync.question('Number: ');
     var contact = {
         name: name,
-        number: parseInt(number)
+        number: parseInt(number),
+        id: contacts[contacts.length - 1].id + 1
     };
+
     contacts.push(contact);
     var content = JSON.stringify(contacts);
     fs.writeFileSync(dataFile,content,{encoding:'utf8'});
     console.log('Add new contact successful !');
 };
 function editContact(){
-    console.log(contacts);
-    var id = readlineSync.question('Choose a number start from 0: ');
+    var search = readlineSync.question('Search a contact you want to edit > ');
+    var searched = searchContact(search);
+    console.log('Result search: ');
+    for(contact of searched){
+        console.log('> ',contact.id, '. ',contact);
+    }
+    var id = readlineSync.question('Choose an id to edit: ');
     var getContact = contacts[id];
-    var name = readlineSync.question('Name: ');
-    var number = readlineSync.question('Number: ');
+    var newName = readlineSync.question('New Name: ');
+    var newNumber = readlineSync.question('New Number: ');
+    var newID = readlineSync.question('New Id: ')
     getContact = {
-        name: name,
-        number: parseInt(number)
+        name: newName,
+        number: parseInt(newNumber),
+        id: parseInt(newID)
     };
     contacts[id] = getContact;
     console.log(contacts);
 }
 function deleteContact(){
-    var id = readlineSync.question('Choose an element to delete start form 0: ');
-    contacts.splice(id, 1);
-    console.log(contacts);
-};
-function searchContact(){
-    var results = readlineSync.question('Enter a name or number to search: ');
-    for(var item of contacts ){
-      if(item.name === results.toLowerCase() || item.number === results.toString()){
-            console.log(item);
-      }
+    var search = readlineSync.question('Search a contact you want to delete > ');
+    var searched = searchContact(search);
+    console.log('Result search: ');
+    for(contact of searched){
+        console.log('> ',contact.id, '. ',contact);
     }
+    var id = readlineSync.question('Choose an id to delete > ');
+    contacts.splice(id, 1);
+    console.log('Done!');
+    console.log(contacts);
+    
+};
+function searchContact(search){
+    var searched = contacts.filter(contact => {
+        var regex = new RegExp(search, 'i');
+        if(regex.test(contact.name) ||
+        regex.test(Number(contact.number)) ||
+        regex.test(Number(contact.id)))
+        {         
+            return contact;   
+        }
+    });
+    return searched;
 };
 function saveAndExit(){
     var content = JSON.stringify(contacts);
     fs.writeFileSync(dataFile,content,{encoding:'utf8'});
+    console.log('Done!');
 };
 function main(){
     loadData();
